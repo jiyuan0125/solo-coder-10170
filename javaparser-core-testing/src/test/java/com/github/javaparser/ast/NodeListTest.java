@@ -376,7 +376,7 @@ class NodeListTest extends AbstractLexicalPreservingTest {
             void whenSet() {
                 assertFalse(iterator.hasNext());
                 assertFalse(iterator.hasPrevious());
-                assertThrows(IllegalArgumentException.class, () -> {
+                assertThrows(IllegalStateException.class, () -> {
                     // Note that the cursor is initially at -1, thus not possible to set the value here
                     iterator.set(new Name("abc"));
                 });

@@ -212,11 +212,6 @@ public class ParserConfiguration {
         public static LanguageLevel RAW = null;
 
         /**
-         * The most used Java version.
-         */
-        public static LanguageLevel POPULAR = JAVA_11;
-
-        /**
          * The latest Java version that is available.
          */
         public static LanguageLevel CURRENT = JAVA_26;
@@ -225,6 +220,12 @@ public class ParserConfiguration {
          * The newest Java features supported.
          */
         public static LanguageLevel BLEEDING_EDGE = JAVA_26;
+
+        /**
+         * The most used Java version.
+         * This is set to the latest supported Java version by default.
+         */
+        public static LanguageLevel POPULAR = CURRENT;
 
         final Validator validator;
 
@@ -268,6 +269,8 @@ public class ParserConfiguration {
     private boolean storeTokens = true;
 
     private boolean attributeComments = true;
+
+    private boolean attributeCommentsExplicitlySet = false;
 
     private boolean doNotAssignCommentsPrecedingEmptyLines = true;
 
@@ -406,9 +409,13 @@ public class ParserConfiguration {
     /**
      * Whether to run CommentsInserter, which will put the comments that were found in the source code into the comment
      * and javadoc fields of the nodes it thinks they refer to.
+     * <p>
+     * Note: if {@link #setStoreTokens(boolean)} is called with {@code false} and this option has not been explicitly
+     * set, it will be automatically set to {@code false} because comment attribution requires token storage.
      */
     public ParserConfiguration setAttributeComments(boolean attributeComments) {
         this.attributeComments = attributeComments;
+        this.attributeCommentsExplicitlySet = true;
         return this;
     }
 
@@ -432,10 +439,20 @@ public class ParserConfiguration {
         return this;
     }
 
+    /**
+     * Sets whether to store tokens during parsing.
+     * <p>
+     * Note: when set to {@code false}, if {@link #setAttributeComments(boolean)} has not been explicitly set,
+     * it will be automatically set to {@code false} because comment attribution relies on token storage.
+     * If attribute comments has been explicitly configured, its value will be preserved.
+     *
+     * @param storeTokens {@code true} to store tokens, {@code false} otherwise
+     * @return this configuration instance
+     */
     public ParserConfiguration setStoreTokens(boolean storeTokens) {
         this.storeTokens = storeTokens;
-        if (!storeTokens) {
-            setAttributeComments(false);
+        if (!storeTokens && !attributeCommentsExplicitlySet) {
+            this.attributeComments = false;
         }
         return this;
     }
