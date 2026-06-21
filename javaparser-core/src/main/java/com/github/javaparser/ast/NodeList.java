@@ -91,10 +91,16 @@ public class NodeList<N extends Node>
     }
 
     public N removeFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         return remove(0);
     }
 
     public N removeLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         return remove(innerList.size() - 1);
     }
 
@@ -140,7 +146,7 @@ public class NodeList<N extends Node>
     @Override
     public N set(int index, N element) {
         if (index < 0 || index >= innerList.size()) {
-            throw new IllegalArgumentException("Illegal index. The index should be between 0 and " + innerList.size()
+            throw new IndexOutOfBoundsException("Illegal index. The index should be between 0 and " + innerList.size()
                     + " excluded. It is instead " + index);
         }
         if (element == innerList.get(index)) {
@@ -178,6 +184,10 @@ public class NodeList<N extends Node>
 
     @Override
     public void add(int index, N node) {
+        if (index < 0 || index > innerList.size()) {
+            throw new IndexOutOfBoundsException("Illegal index. The index should be between 0 and " + innerList.size()
+                    + " included. It is instead " + index);
+        }
         notifyElementAdded(index, node);
         own(node);
         innerList.add(index, node);
@@ -624,7 +634,7 @@ public class NodeList<N extends Node>
         public void set(N n) {
             int index = innerList.indexOf(current);
             if (index < 0 || index >= innerList.size()) {
-                throw new IllegalArgumentException("Illegal index. The index should be between 0 and "
+                throw new IndexOutOfBoundsException("Illegal index. The index should be between 0 and "
                         + innerList.size() + " excluded. It is instead " + index);
             }
             if (n != innerList.get(index)) {

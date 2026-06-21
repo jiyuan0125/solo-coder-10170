@@ -117,11 +117,12 @@ public final class JavaParser {
         assertNotNull(provider);
         List<Processor> processors =
                 configuration.getProcessors().stream().map(Supplier::get).collect(toList());
-        for (Processor processor : processors) {
-            provider = processor.preProcess(provider);
-        }
-        final GeneratedJavaParser parser = getParserForProvider(provider);
+        GeneratedJavaParser parser = null;
         try {
+            for (Processor processor : processors) {
+                provider = processor.preProcess(provider);
+            }
+            parser = getParserForProvider(provider);
             N resultNode = start.parse(parser);
             ParseResult<N> result = new ParseResult<>(resultNode, parser.problems, parser.getCommentsCollection());
             for (Processor processor : processors) {
@@ -131,8 +132,14 @@ public final class JavaParser {
             return result;
         } catch (Exception e) {
             final String message = e.getMessage() == null ? "Unknown error" : e.getMessage();
-            parser.problems.add(new Problem(message, null, e));
-            return new ParseResult<>(null, parser.problems, parser.getCommentsCollection());
+            if (parser != null) {
+                parser.problems.add(new Problem(message, null, e));
+                return new ParseResult<>(null, parser.problems, parser.getCommentsCollection());
+            } else {
+                List<Problem> problems = new java.util.ArrayList<>();
+                problems.add(new Problem(message, null, e));
+                return new ParseResult<>(null, problems, null);
+            }
         } finally {
             try {
                 provider.close();

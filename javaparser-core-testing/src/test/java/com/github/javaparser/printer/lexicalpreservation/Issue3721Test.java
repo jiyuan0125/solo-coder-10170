@@ -37,7 +37,6 @@ public class Issue3721Test extends AbstractLexicalPreservingTest {
                 + "}\n");
 
         String expected = "public class Bug {\n"
-                + "\n"
                 + "    public static void main(String[] args) {\n"
                 + "        boolean msg;\n"
                 + "    }\n"
