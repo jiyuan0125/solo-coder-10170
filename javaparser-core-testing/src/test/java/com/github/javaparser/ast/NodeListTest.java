@@ -376,8 +376,10 @@ class NodeListTest extends AbstractLexicalPreservingTest {
             void whenSet() {
                 assertFalse(iterator.hasNext());
                 assertFalse(iterator.hasPrevious());
-                assertThrows(IllegalStateException.class, () -> {
-                    // Note that the cursor is initially at -1, thus not possible to set the value here
+                assertThrows(IndexOutOfBoundsException.class, () -> {
+                    // Cursor is initially at -1; calling set() before next()/previous()
+                    // must throw IndexOutOfBoundsException per List contract,
+                    // aligning with NodeList.set(int, N) semantics.
                     iterator.set(new Name("abc"));
                 });
                 // Assert that next/previous are still empty

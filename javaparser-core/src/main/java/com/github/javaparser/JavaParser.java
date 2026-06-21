@@ -108,6 +108,15 @@ public final class JavaParser {
      * Parses source code.
      * It takes the source code from a Provider.
      * The start indicates what can be found in the source code (compilation unit, block, import...)
+     * <p>
+     * <b>Resource cleanup guarantee</b>: The provider (including the original underlying
+     * {@link java.io.Reader} or {@link java.io.InputStream}) will always be closed after
+     * parsing, regardless of success or failure. This covers the full pre-processing chain:
+     * if any {@link Processor#preProcess(Provider)} step throws, or parser construction fails,
+     * the {@code finally} block closes the outermost provider. Since each wrapper provider
+     * (e.g. {@code UnicodeEscapeProcessingProvider}, {@code LineEndingProcessingProvider})
+     * propagates {@code close()} to its inner delegate, the original resource at the end of
+     * the chain is guaranteed to be released, preventing file descriptor leaks.
      *
      * @param start refer to the constants in ParseStart to see what can be parsed.
      * @param provider refer to Providers to see how you can read source. The provider will be closed after parsing.

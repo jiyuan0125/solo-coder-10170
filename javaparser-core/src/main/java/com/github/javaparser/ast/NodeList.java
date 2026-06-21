@@ -90,6 +90,16 @@ public class NodeList<N extends Node>
         return innerList.remove(node);
     }
 
+    /**
+     * Removes and returns the first element of this list.
+     * <p>
+     * This method conforms to the {@link java.util.Deque} contract:
+     * when the list is empty, {@link NoSuchElementException} is thrown
+     * instead of letting an internal {@code ArrayIndexOutOfBoundsException} escape.
+     *
+     * @return the first element of this list
+     * @throws NoSuchElementException if this list is empty
+     */
     public N removeFirst() {
         if (isEmpty()) {
             throw new NoSuchElementException();
@@ -97,6 +107,16 @@ public class NodeList<N extends Node>
         return remove(0);
     }
 
+    /**
+     * Removes and returns the last element of this list.
+     * <p>
+     * This method conforms to the {@link java.util.Deque} contract:
+     * when the list is empty, {@link NoSuchElementException} is thrown
+     * instead of letting an internal {@code ArrayIndexOutOfBoundsException} escape.
+     *
+     * @return the last element of this list
+     * @throws NoSuchElementException if this list is empty
+     */
     public N removeLast() {
         if (isEmpty()) {
             throw new NoSuchElementException();
@@ -143,6 +163,20 @@ public class NodeList<N extends Node>
         return new NodeListIterator(innerList);
     }
 
+    /**
+     * Replaces the element at the specified position in this list with the specified element.
+     * <p>
+     * This method conforms to the {@link java.util.List} contract: an invalid index
+     * ({@code index < 0 || index >= size()}) throws {@link IndexOutOfBoundsException},
+     * not {@code IllegalArgumentException}.
+     *
+     * @param index index of the element to replace
+     * @param element element to be stored at the specified position
+     * @return the element previously at the specified position
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         ({@code index < 0 || index >= size()})
+     * @see java.util.List#set(int, Object)
+     */
     @Override
     public N set(int index, N element) {
         if (index < 0 || index >= innerList.size()) {
@@ -181,6 +215,21 @@ public class NodeList<N extends Node>
         }
     }
 
+    /**
+     * Inserts the specified element at the specified position in this list.
+     * Shifts the element currently at that position (if any) and any subsequent
+     * elements to the right (adds one to their indices).
+     * <p>
+     * This method conforms to the {@link java.util.List} contract: an invalid index
+     * ({@code index < 0 || index > size()}) throws {@link IndexOutOfBoundsException},
+     * not {@code IllegalArgumentException}.
+     *
+     * @param index index at which the specified element is to be inserted
+     * @param node element to be inserted
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         ({@code index < 0 || index > size()})
+     * @see java.util.List#add(int, Object)
+     */
     @Override
     public void add(int index, N node) {
         if (index < 0 || index > innerList.size()) {
@@ -349,6 +398,20 @@ public class NodeList<N extends Node>
     }
 
     /**
+     * Inserts all of the elements in the specified collection into this
+     * list, starting at the specified position.
+     * <p>
+     * This method conforms to the {@link java.util.List} contract: an invalid index
+     * ({@code index < 0 || index > size()}) throws {@link IndexOutOfBoundsException},
+     * not {@code IllegalArgumentException}. The per-element index validation is
+     * delegated to {@link #add(int, Node)}.
+     *
+     * @param index index at which to insert the first element from the
+     *        specified collection
+     * @param c collection containing elements to be added to this list
+     * @return {@code true} if this list changed as a result of the call
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         ({@code index < 0 || index > size()})
      * @see java.util.List#addAll(int, java.util.Collection)
      */
     @Override
@@ -628,11 +691,27 @@ public class NodeList<N extends Node>
             iterator.remove();
         }
 
+        /**
+         * Replaces the last element returned by {@link #next()} or {@link #previous()}
+         * with the specified element.
+         * <p>
+         * When the cursor has not been advanced (i.e. neither {@code next()} nor
+         * {@code previous()} has been called yet, equivalent to {@code cursor == -1}),
+         * this method conforms to the same index-based contract as
+         * {@link NodeList#set(int, Node)} and throws {@link IndexOutOfBoundsException}.
+         *
+         * @param n the element with which to replace the last element returned by
+         *        {@code next} or {@code previous}
+         * @throws IndexOutOfBoundsException if the cursor has not been advanced
+         *         (neither {@code next} nor {@code previous} has been called)
+         * @see java.util.ListIterator#set(Object)
+         * @see NodeList#set(int, Node)
+         */
         @Override
         public void set(N n) {
             int index = innerList.indexOf(current);
             if (index < 0) {
-                throw new IllegalStateException();
+                throw new IndexOutOfBoundsException("Cursor has not been advanced: call next() or previous() before set()");
             }
             if (n != innerList.get(index)) {
                 notifyElementReplaced(index, n);
